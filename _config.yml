@@ -6,17 +6,19 @@
 title: East River Village
 subtitle: enjoy the sunshine
 description:
+
+# Author
 author: kaba
 author_title: I am a system engineer interested in dissecting things. If I find something interesting, this is the place I share the experience.
-avatar: images/favicon.png
+avatar: "/images/profile_author.jpg"
 language: en
 timezone: Asia/Kolkata
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
+url: http://eastrivervillage.com
 root: /
-permalink: :year/:month/:day/:title/
+permalink: :title/
 permalink_defaults:
 
 # Directory
@@ -93,6 +95,6 @@ widgets:
 
 #Contact
 contact:
-  url: about_me
-  icon: github fa-github
+  url: about
+  icon: user
 
