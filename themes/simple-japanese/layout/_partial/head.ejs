@@ -1,0 +1,24 @@
+<% var title = page.title %>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title><% if (title){ %><%= title %> | <% } %><%= config.title %></title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1">
+  <%- open_graph({
+    image: page.thumbnail,
+    twitter_id: theme.twitter,
+    google_plus: theme.google_plus,
+    fb_admins: theme.fb_admins,
+    fb_app_id: theme.fb_app_id
+  }) %>
+  <link rel="icon" href="/favicon.ico">
+  <%- partial('google-analytics', { head: true }) %>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <%- css('css/style') %>
+  <%- partial('gen-structured-data') %>
+  <% if (is_post() && config.generator_amp){ %>
+    <link rel="amphtml" href="<%= config.url %><%= config.root %><%= page.path.replace(".html", "") %>/amp/index.html">
+  <% } %>
+</head>
