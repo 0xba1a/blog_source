@@ -17,7 +17,6 @@ timezone: Asia/Kolkata
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
 url: http://eastrivervillage.com
-root: /
 permalink: :title/
 permalink_defaults:
 
@@ -98,3 +97,5 @@ contact:
   url: about
   icon: user
 
+# Google tag manager
+google_analytics: GTM-5LB7LCD
