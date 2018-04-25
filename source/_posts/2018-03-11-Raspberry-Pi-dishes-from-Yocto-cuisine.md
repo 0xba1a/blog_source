@@ -1,6 +1,6 @@
 ---
 title: Raspberry Pi dishes from Yocto cuisine
-date: 2018-03-11 17:10:50
+date: 2018-04-25 21:30:50
 thumbnail: "/images/raspberry_pi_3_yocto.jpg"
 tags:
  - RaspberryPi
@@ -15,13 +15,32 @@ I created a directory in Desktop as base for the development. Inside it I create
 $ ls
 build  downloads  sstate  sstate-cache  tmp  yocto
 ```
-With reference to the [meta-raspberry quick start](http://meta-raspberrypi.readthedocs.io/en/latest/readme.html#quick-start) page, I have cloned [poky](http://git.yoctoproject.org/cgit.cgi/poky), [meta-openembedded](http://git.openembedded.org/meta-openembedded) and [meta-raspberry](https://github.com/agherzan/meta-raspberrypi) inside the `yocto` directory.
+With reference to the [meta-raspberry quick start](http://meta-raspberrypi.readthedocs.io/en/latest/readme.html#quick-start) page, I have cloned [poky](http://git.yoctoproject.org/cgit.cgi/poky), [meta-openembedded](http://git.openembedded.org/meta-openembedded) and [meta-raspberry](https://github.com/agherzan/meta-raspberrypi) inside the `yocto` directory. And checkout to specific branches.
 ```sh
 $ cd yocto
 $ git clone git://git.yoctoproject.org/poky.git
+$ cd poky
+$ git checkout origin/master
+$ $ git rev-parse HEAD
+da3625c52e1ab8985fba4fc3d133edf92142f182
+$
+$ cd ..
 $ git clone git://git.openembedded.org/meta-openembedded
-$ git clone git@github.com:agherzan/meta-raspberrypi.git
+$ cd meta-openembedded
+$ $ git rev-parse HEAD
+271ce3576be25d8012af15961f827aa2235e6434
+$
+$ cd ..
+$ git clone git://git.yoctoproject.org/meta-raspberrypi
+$ cd meta-raspberry
+$ git checkout master
+$ git rev-parse HEAD
+693f36dded2f29fd77720f7b2e7c88ea76554466
 ```
+You can find all the available layers [here](http://layers.openembedded.org/layerindex/branch/master/layers/)
+
+_Only the above branches and commits worked for me. With rocko branch had pypi.class error_
+
 Sourced the `oe-init` script to setup build environment. And then configured the `conf/bblayers.conf` file to include `meta-layers` from meta-openembedded and meta-raspberry layers. The [meta-raspberry quick start](http://meta-raspberrypi.readthedocs.io/en/latest/readme.html#quick-start) specifies `meta-oe`, `meta-multimedia`, `meta-networking` and `meta-python` as dependencies for `meta-raspberry`. So I'm including all of the into my `conf/bblayers.conf` file.
 ```sh
 $ source yocto/poky/oe-init-build-env build/rpi3/
@@ -39,7 +58,7 @@ Common targets are:
 You can also run generated qemu images with a command like 'runqemu qemux86'
 $ pwd
 /home/kaba/Desktop/yocto/build/rpi3
-$ cat conf/bblayers.conf 
+$ cat conf/bblayers.conf
 # POKY_BBLAYERS_CONF_VERSION is increased each time build/conf/bblayers.conf
 # changes incompatibly
 POKY_BBLAYERS_CONF_VERSION = "2"
@@ -101,147 +120,100 @@ BB_DISKMON_DIRS ??= "\
 $
 ```
 The variable `${TOPDIR}` represents the build directory by default.
+`debug-tweaks` will enable root account without password. `ssh-server-openssh` will install an ssh server using openssh. And the ssh server will be started automatically during boot-up.
 
-Check available image types for Raspberry Pi under the directory `../../yocto/meta-raspberry/recipes-core/images`. I was using the minimal `rpi-hwup-image`.
+Build a basic image - `core-image-base`
 ```sh
-$ ls ../../yocto/meta-raspberrypi/recipes-core/images/
-rpi-basic-image.bb  rpi-hwup-image.bb  rpi-test-image.bb
-$
-$ bitbake rpi-hwup-image
+$ bitbake core-image-base
+WARNING: Layer openembedded-layer should set LAYERSERIES_COMPAT_openembedded-layer in its conf/layer.conf file to list the core layer names it is compatible with.
+WARNING: Layer multimedia-layer should set LAYERSERIES_COMPAT_multimedia-layer in its conf/layer.conf file to list the core layer names it is compatible with.
+WARNING: Layer networking-layer should set LAYERSERIES_COMPAT_networking-layer in its conf/layer.conf file to list the core layer names it is compatible with.
+WARNING: Layer meta-python should set LAYERSERIES_COMPAT_meta-python in its conf/layer.conf file to list the core layer names it is compatible with.
+WARNING: Layer openembedded-layer should set LAYERSERIES_COMPAT_openembedded-layer in its conf/layer.conf file to list the core layer names it is compatible with.
+WARNING: Layer multimedia-layer should set LAYERSERIES_COMPAT_multimedia-layer in its conf/layer.conf file to list the core layer names it is compatible with.
+WARNING: Layer networking-layer should set LAYERSERIES_COMPAT_networking-layer in its conf/layer.conf file to list the core layer names it is compatible with.
+WARNING: Layer meta-python should set LAYERSERIES_COMPAT_meta-python in its conf/layer.conf file to list the core layer names it is compatible with.
 WARNING: Host distribution "ubuntu-17.10" has not been validated with this version of the build system; you may possibly experience unexpected failures. It is recommended that you use a tested distribution.
-ERROR: ParseError at /home/kaba/Desktop/yocto/build/rpi3/../../yocto/meta-raspberrypi/recipes-devtools/python/rpio_0.10.0.bb:9: Could not inherit file classes/pypi.bbclass
-
-Summary: There was 1 WARNING message shown.
-Summary: There was 1 ERROR message shown, returning a non-zero exit code.
-$
-```
-Surprised? Nah! If it went through without a problem that would be a surprise. After all I wouldn't be sitting here writing this blog if it was a breeze. Of course its not a rocket science either. Initially I thought some variable I configured wrongly, so the path to `pypi.bbclass` couldn't be reached. I searched in the `yocto` directory for `pypi.class` file. To my surprise, the file is not found!
-```
-$ find ../../yocto/ -name 'pypi.class'
-$
-```
-Ah! Something has changed in either `poky` or `meta-openembedded` that broke the dependency of `rpio_0.10.0.bb` of `meta-raspberry`. Some googling brought me to this [page](https://github.com/agherzan/meta-raspberrypi/issues/195). It seems `meta-openembedded` developers have removed the `pypi.class` as it is added to `oe-core` - *openembedded-core* - just a month back. I don't completely understand the difference between `meta-openembedded` and `openembedded-core` layers. So I simply cloned the `openembedded-core` repo and added it into the `bblayers.conf`.
-```sh
-$ git clone git@github.com:openembedded/openembedded-core.git ../../yocto/
-$ ls ../../yocto/
-meta-openembedded  meta-raspberrypi  openembedded-core  poky
-$
-$ head -n 13 conf/bblayers.conf | tail -n 3
-${TOPDIR}/../../yocto/poky/meta-yocto-bsp \
-${TOPDIR}/../../yocto/openembedded-core/meta \
-${TOPDIR}/../../yocto/meta-openembedded/meta-oe \
-$
-```
-Started the build again
-```sh
-$ bitbake rpi-hwup-image
-WARNING: Host distribution "ubuntu-17.10" has not been validated with this version of the build system; you may possibly experience unexpected failures. It is recommended that you use a tested distribution.
-WARNING: /home/kaba/Desktop/yocto/build/rpi3/../../yocto/meta-openembedded/meta-networking/recipes-support/libtevent/libtevent_0.9.33.bb: Exception during build_dependencies for do_compile
-WARNING: /home/kaba/Desktop/yocto/build/rpi3/../../yocto/meta-openembedded/meta-networking/recipes-support/libtevent/libtevent_0.9.33.bb: Error during finalise of /home/kaba/Desktop/yocto/build/rpi3/../../yocto/meta-openembedded/meta-networking/recipes-support/libtevent/libtevent_0.9.33.bb
-WARNING: /home/kaba/Desktop/yocto/build/rpi3/../../yocto/meta-openembedded/meta-networking/recipes-support/libtdb/libtdb_1.3.15.bb: Exception during build_dependencies for do_compile
-WARNING: /home/kaba/Desktop/yocto/build/rpi3/../../yocto/meta-openembedded/meta-networking/recipes-support/libtdb/libtdb_1.3.15.bb: Error during finalise of /home/kaba/Desktop/yocto/build/rpi3/../../yocto/meta-openembedded/meta-networking/recipes-support/libtdb/libtdb_1.3.15.bb
-ERROR: ExpansionError during parsing /home/kaba/Desktop/yocto/build/rpi3/../../yocto/meta-openembedded/meta-networking/recipes-support/libtevent/libtevent_0.9.33.bb
-Traceback (most recent call last):
-bb.data_smart.ExpansionError: Failure expanding variable do_compile, expression was     python ./buildtools/bin/waf ${@oe.utils.parallel_make_argument(d, '-j%d', limit=64)}
- which triggered exception AttributeError: module 'oe.utils' has no attribute 'parallel_make_argument'
-
-WARNING: /home/kaba/Desktop/yocto/build/rpi3/../../yocto/meta-openembedded/meta-networking/recipes-support/libtalloc/libtalloc_2.1.10.bb: Exception during build_dependencies for do_compile
-WARNING: /home/kaba/Desktop/yocto/build/rpi3/../../yocto/meta-openembedded/meta-networking/recipes-support/libtalloc/libtalloc_2.1.10.bb: Error during finalise of /home/kaba/Desktop/yocto/build/rpi3/../../yocto/meta-openembedded/meta-networking/recipes-support/libtalloc/libtalloc_2.1.10.bb
-
-Summary: There were 7 WARNING messages shown.
-Summary: There was 1 ERROR message shown, returning a non-zero exit code.
-$
-```
-Failed again!
-Here the catch is `module 'oe.utils' has no attribute 'parallel_make_argument'`. Lets see who defined the function `parallel_make_argument`.
-```sh
-$ grep -rn 'def parallel_make_argument' ../../yocto/
-../../yocto/openembedded-core/meta/lib/oe/utils.py:182:def parallel_make_argument(d, fmt, limit=None):
-$
-```
-Yup! The function `parallel_make_argument` is defined in the file `oe/utils.py`. So whats wrong. There is one more `oe/utils.py` file which is under `poky/meta` directory. Even though `poky` is mentioned as a dependency for `meta-raspberry`, lets just give a try removing `poky/meta` and see what happens as we are now using `openembedded-core/meta`.
-```sh
-$ cat conf/bblayers.conf 
-# POKY_BBLAYERS_CONF_VERSION is increased each time build/conf/bblayers.conf
-# changes incompatibly
-POKY_BBLAYERS_CONF_VERSION = "2"
-
-BBPATH = "${TOPDIR}"
-BBFILES ?= ""
-
-BBLAYERS ?= " \
-  ${TOPDIR}/../../yocto/openembedded-core/meta \
-  ${TOPDIR}/../../yocto/meta-openembedded/meta-oe \
-  ${TOPDIR}/../../yocto/meta-openembedded/meta-multimedia \
-  ${TOPDIR}/../../yocto/meta-openembedded/meta-networking \
-  ${TOPDIR}/../../yocto/meta-openembedded/meta-python \
-  ${TOPDIR}/../../yocto/meta-raspberrypi \
-  "
-$ bitbake rpi-hwup-image
-ERROR:  OE-core's config sanity checker detected a potential misconfiguration.
-    Either fix the cause of this error or at your own risk disable the checker (see sanity.conf).
-    Following is the list of potential problems / advisories:
-
-    DISTRO 'poky' not found. Please set a valid DISTRO in your local.conf
-
-
-Summary: There was 1 ERROR message shown, returning a non-zero exit code.
-$
-```
-Okay my bad. Lets change `DISTRO` from `poky` to `nodistro` and try.
-```sh
-$ head -n 4 conf/local.conf 
-MACHINE = "raspberrypi3-64"
-#DISTRO ?= "poky"
-DISTRO ?= "nodistro"
-PACKAGE_CLASSES ?= "package_rpm"
-$ bitbake rpi-hwup-image
-Parsing recipes: 100% |######################################################################################################################################################################| Time: 0:04:09
-Parsing of 2077 .bb files complete (0 cached, 2077 parsed). 2933 targets, 146 skipped, 0 masked, 0 errors.
+Parsing recipes: 100% |#################################################################################################################################################| Time: 0:03:49
+Parsing of 2081 .bb files complete (0 cached, 2081 parsed). 2940 targets, 116 skipped, 0 masked, 0 errors.
 NOTE: Resolving any missing task queue dependencies
 
 Build Configuration:
-BB_VERSION           = "1.36.0"
+BB_VERSION           = "1.37.0"
 BUILD_SYS            = "x86_64-linux"
 NATIVELSBSTRING      = "ubuntu-17.10"
-TARGET_SYS           = "aarch64-oe-linux"
+TARGET_SYS           = "aarch64-poky-linux"
 MACHINE              = "raspberrypi3-64"
-DISTRO               = "nodistro"
-DISTRO_VERSION       = "nodistro.0"
+DISTRO               = "poky"
+DISTRO_VERSION       = "2.5"
 TUNE_FEATURES        = "aarch64"
 TARGET_FPU           = ""
-meta                 = "master:e4da78229f0bd67fd34928eafe48dbdc9e8da050"
+meta                 
+meta-poky            
+meta-yocto-bsp       = "HEAD:da3625c52e1ab8985fba4fc3d133edf92142f182"
 meta-oe              
 meta-multimedia      
 meta-networking      
 meta-python          = "master:271ce3576be25d8012af15961f827aa2235e6434"
-meta-raspberrypi     = "master:79ea44b997a6eb6e2f0d36b1d583c85fa9e37f36"
+meta-raspberrypi     = "master:693f36dded2f29fd77720f7b2e7c88ea76554466"
 
-Initialising tasks: 100% |###################################################################################################################################################################| Time: 0:00:05
+NOTE: Fetching uninative binary shim from http://downloads.yoctoproject.org/releases/uninative/1.9/x86_64-nativesdk-libc.tar.bz2;sha256sum=c26622a1f27dbf5b25de986b11584b5c5b2f322d9eb367f705a744f58a5561ec
+Initialising tasks: 100% |##############################################################################################################################################| Time: 0:00:04
 NOTE: Executing SetScene Tasks
 NOTE: Executing RunQueue Tasks
-WARNING: rpi-hwup-image-1.0-r0 do_image: The image 'rpi-hwup-image' is deprecated, please use 'core-image-minimal' instead
-NOTE: Tasks Summary: Attempted 1966 tasks of which 5 didn't need to be rerun and all succeeded.
+NOTE: Tasks Summary: Attempted 3407 tasks of which 106 didn't need to be rerun and all succeeded.
 
-Summary: There was 1 WARNING message shown.
+Summary: There were 9 WARNING messages shown.
+kaba@kaba-Vostro-1550:~/Desktop/yocto/build/rpi3
 $
 ```
-Tadaannn!!!
 
 ### Installation and booting
-If everything goes well, you can see the final image `tmp/deploy/images/raspberrypi3-64/rpi-hwup-image-raspberrypi3-64.rpi-sdimg`. But in my case the path is `tmp-glibc` instead of `tmp` - *the final image path was `tmp-glibc/deploy/images/raspberrypi3-64/rpi-hwup-raspberrypi3-64.rpi-sdimg`*. The path is relative to your build directory - *`build/rpi3`*. It is a soft-link to your latest build image. `dd` it to your sd-card - *`/dev/sdb` in my case* - and boot the Raspberry Pi 3 with it.
+If everything goes well, you can see the final image `tmp/deploy/images/raspberrypi3-64/core-image-base-raspberrypi3-64.rpi-sdimg`. The path is relative to your build directory - *`build/rpi3`*. It is a soft-link to your latest build image. `dd` it to your sd-card - *`/dev/sdb` in my case* - and boot the Raspberry Pi 3 with it.
 ```sh
 $ sudo umount /dev/sdb*
-$ sudo dd if=tmp-glibc/deploy/images/raspberrypi3-64/rpi-hwup-image-raspberrypi3-64.rpi-sdimg of=/dev/sdb bs=4M
+$ sudo dd if=tmp/deploy/images/raspberrypi3-64/core-image-base-raspberrypi3-64.rpi-sdimg of=/dev/sdb bs=1M
 $ sudo umount /dev/sdb*
 ```
-As for as I remember , I didn't configure any IP address as default for the board. So I connected a display to the Pi and checked. The `sshd` daemon is running but I couldn't see `wifi` interfaces enabled. Let me figure that out and write in next post.
+
+### WiFi configuration in Raspberry Pi
+To access Raspberry Pi over ssh it should be part of network first. So for the first boot, connect a monitor to the board and boot with your sd-card.
+
+Edit `wpa_supplicant.conf` file to input WiFi access point related information.
+```sh
+root@raspberrypi3-64:~# cat /etc/wpa_supplicant.conf 
+ctrl_interface=/var/run/wpa_supplicant
+ctrl_interface_group=0
+update_config=1
+
+network={
+	ssid="Bluetooth"
+	psk="**********"
+}
+root@raspberrypi3-64:~#
+```
+Enter your WiFi access point password against psk.
+
+And bring-up interface `wlan0` on boot-up
+```sh
+root@raspberrypi3-64:~# cat /etc/init.d/networking
+.
+.
+start)
+	.
+	.
+	ifup wlan0
+	.
+	.
+.
+.
+```
+Configure sticky IP in your access point for your Raspberry Pi corresponding to its mac. So every time after reboot you can straightaway ssh to Raspberry Pi.
 
 ### References
- * [http://meta-raspberrypi.readthedocs.io/en/latest/readme.html]
+ * [https://media.readthedocs.org/pdf/meta-raspberrypi/latest/meta-raspberrypi.pdf]
  * [http://www.jumpnowtek.com/rpi/Raspberry-Pi-Systems-with-Yocto.html]
  * [https://raspinterest.wordpress.com/2016/11/30/yocto-project-on-raspberry-pi-3/]
  * [https://stackoverflow.com/questions/35904769/what-are-the-differences-between-open-embedded-core-and-meta-openembedded]
  * [https://github.com/agherzan/meta-raspberrypi/issues/195]
  * [https://patchwork.openembedded.org/patch/36139/]
- * [file://openembedded-core/meta/lib/oeqa/selftest/cases/imagefeatures.py]
