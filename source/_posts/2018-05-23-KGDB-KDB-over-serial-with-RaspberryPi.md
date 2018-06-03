@@ -86,7 +86,7 @@ kaba@kaba-Vostro-1550:~/Desktop/yocto/yocto
 $
 ```
 
-Build `kernel` and `populate_sdk`. Refer [this](http://localhost:4000/KGDBoE-on-RaspberryPi-building-out-of-the-kernel-tree-module-with-yocto/) and [this](http://localhost:4000/Raspberry-Pi-dishes-from-Yocto-cuisine/) if you need help on working with Yocto. And copy the newly built image to Raspberry Pi.
+Build `kernel` and `populate_sdk`. Refer [this](http://eastrivervillage.com/KGDBoE-on-RaspberryPi-building-out-of-the-kernel-tree-module-with-yocto/) and [this](http://eastrivervillage.com/Raspberry-Pi-dishes-from-Yocto-cuisine/) if you need help on working with Yocto. And copy the newly built image to Raspberry Pi.
 
 ### Enable Serial in Raspberry Pi
 By default serial interface is not enabled in yocto built Raspberry Pi distribution. We have to enable it in the config.txt file. Connect the SD-card written with Raspberry Pi image to PC and mount first partition. Append `enable_uart=1` to the config.txt file.
