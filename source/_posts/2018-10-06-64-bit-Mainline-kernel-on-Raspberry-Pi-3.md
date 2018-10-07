@@ -1,6 +1,7 @@
 ---
 title: 64-bit Mainline kernel on Raspberry Pi 3
 date: 2018-10-06 18:42:20
+thumbnail: "/images/64bit_kernel_rpi3.jpg"
 tags:
  - raspberrypi
  - linux
