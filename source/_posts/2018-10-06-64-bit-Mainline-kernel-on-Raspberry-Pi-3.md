@@ -88,37 +88,88 @@ $ make O=../rpi_out ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- dtbs
 .
 ```
 
-Partition your memory card into two. The first one should be FAT and second one should be EXT4. The first partition should be a boot partition.
+Partition your memory card into two. The first one should be FAT32 and second one should be EXT4. The first partition should be a boot partition.
 ```sh
-$ sudo mkfs.fat /dev/sdb1
-mkfs.fat 4.1 (2017-01-24)
-kaba@kaba-Vostro-1550:/media/kaba
-$ sudo mkfs.ext4 /dev/sdb2
-mke2fs 1.43.5 (04-Aug-2017)
-Creating filesystem with 3863424 4k blocks and 966656 inodes
-Filesystem UUID: 5f719b7c-e898-42fa-843a-b6e8e8bddbef
-Superblock backups stored on blocks: 
-	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208
+balakumaran@balakumaran-USB:~/Desktop/RPi/linux_build$ sudo parted /dev/sdd
+[sudo] password for balakumaran: 
+GNU Parted 3.2
+Using /dev/sdd
+Welcome to GNU Parted! Type 'help' to view a list of commands.
+(parted) print                                                            
+Model: MXT-USB Storage Device (scsi)
+Disk /dev/sdd: 31.9GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+Disk Flags: 
 
-Allocating group tables: done                            
-Writing inode tables: done                            
-Creating journal (16384 blocks): done
-Writing superblocks and filesystem accounting information: done   
+Number  Start   End     Size    Type     File system  Flags
+ 1      1049kB  106MB   105MB   primary  fat32        boot, lba
+ 2      106MB   31.9GB  31.8GB  primary
 
-kaba@kaba-Vostro-1550:/media/kaba
-$ sudo fdisk -l /dev/sdb
-Disk /dev/sdb: 14.9 GiB, 15931539456 bytes, 31116288 sectors
+(parted) help rm                                                          
+  rm NUMBER                                delete partition NUMBER
+
+        NUMBER is the partition number used by Linux.  On MS-DOS disk labels, the primary partitions number from 1 to 4, logical partitions from 5 onwards.
+(parted) rm 1                                                             
+(parted) rm 2                                                             
+(parted) print
+Model: MXT-USB Storage Device (scsi)
+Disk /dev/sdd: 31.9GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+Disk Flags: 
+
+Number  Start  End  Size  Type  File system  Flags
+
+(parted) help mkpart
+  mkpart PART-TYPE [FS-TYPE] START END     make a partition
+
+        PART-TYPE is one of: primary, logical, extended
+        FS-TYPE is one of: zfs, btrfs, nilfs2, ext4, ext3, ext2, fat32, fat16, hfsx, hfs+, hfs, jfs, swsusp, linux-swap(v1), linux-swap(v0), ntfs, reiserfs, freebsd-ufs, hp-ufs, sun-ufs,
+        xfs, apfs2, apfs1, asfs, amufs5, amufs4, amufs3, amufs2, amufs1, amufs0, amufs, affs7, affs6, affs5, affs4, affs3, affs2, affs1, affs0, linux-swap, linux-swap(new), linux-swap(old)
+        START and END are disk locations, such as 4GB or 10%.  Negative values count from the end of the disk.  For example, -1s specifies exactly the last sector.
+        
+        'mkpart' makes a partition without creating a new file system on the partition.  FS-TYPE may be specified to set an appropriate partition ID.
+(parted) mkpart primary fat32 2048s 206848s
+(parted) mkpart primary ext4 208896s -1s
+(parted) print                                                            
+Model: MXT-USB Storage Device (scsi)
+Disk /dev/sdd: 31.9GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+Disk Flags: 
+
+Number  Start   End     Size    Type     File system  Flags
+ 1      1049kB  106MB   105MB   primary  fat32        lba
+ 2      107MB   31.9GB  31.8GB  primary  ext4         lba
+
+(parted) set 1 boot on                                                    
+(parted) print                                                            
+Model: MXT-USB Storage Device (scsi)
+Disk /dev/sdd: 31.9GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+Disk Flags: 
+
+Number  Start   End     Size    Type     File system  Flags
+ 1      1049kB  106MB   105MB   primary  fat32        boot, lba
+ 2      107MB   31.9GB  31.8GB  primary  ext4         lba
+
+(parted) quit                                                             
+Information: You may need to update /etc/fstab.
+
+balakumaran@balakumaran-USB:~/Desktop/RPi/linux_build$ sudo fdisk -l /dev/sdd
+Disk /dev/sdd: 29.7 GiB, 31914983424 bytes, 62333952 sectors
 Units: sectors of 1 * 512 = 512 bytes
 Sector size (logical/physical): 512 bytes / 512 bytes
 I/O size (minimum/optimal): 512 bytes / 512 bytes
 Disklabel type: dos
-Disk identifier: 0x00000000
+Disk identifier: 0xcde890ba
 
 Device     Boot  Start      End  Sectors  Size Id Type
-/dev/sdb1  *      2048   206848   204801  100M  b W95 FAT32
-/dev/sdb2       208896 31116287 30907392 14.8G 83 Linux
-kaba@kaba-Vostro-1550:/media/kaba
-$
+/dev/sdd1  *      2048   206848   204801  100M  c W95 FAT32 (LBA)
+/dev/sdd2       208896 62333951 62125056 29.6G 83 Linux
+balakumaran@balakumaran-USB:~/Desktop/RPi/linux_build$
 ```
 
 Copy firmware and kernel to boot partition.
