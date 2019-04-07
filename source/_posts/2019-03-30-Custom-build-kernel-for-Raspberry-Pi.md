@@ -1,7 +1,7 @@
 ---
 title: Custom build kernel for Raspberry Pi
 date: 2019-03-30 18:26:30
-thumbnail: "images/custom_kernel_rpi3.jpg"
+thumbnail: "/images/custom_kernel_rpi3.jpg"
 tags:
  - raspberrypi
  - linux
@@ -188,6 +188,7 @@ I referred [this](https://a-delacruz.github.io/ubuntu/rpi3-setup-filesystem.html
  * https://a-delacruz.github.io/ubuntu/rpi3-setup-filesystem.html
  * https://www.linuxquestions.org/questions/slackware-arm-108/raspberry-pi-3-b-wifi-nic-not-found-4175627137/#post5840054
  * http://cdimage.ubuntu.com/ubuntu-base/releases/
+ * https://raspberrypi.stackexchange.com/questions/61319/how-to-add-wifi-drivers-in-custom-kernel
 
 
 ## Appendix
