@@ -17,7 +17,7 @@ total 32K
 drwxrwxr-x  3 balakumaran balakumaran 4.0K Mar  9 19:33 firmware
 drwxr-xr-x  8 balakumaran balakumaran 4.0K Jan 23 01:52 gcc-linaro-7.4.1-2019.02-x86_64_aarch64-linux-gnu
 drwxrwxr-x 22 balakumaran balakumaran 4.0K Mar 30 18:38 kernel_out
-drwxrwxr-x 26 balakumaran balakumaran 4.0K Mar 30 18:13 linux-rpi-4.19.y
+drwxrwxr-x 26 balakumaran balakumaran 4.0K Mar 30 18:13 linux-rpi-4.14.y
 drwxrwxr-x 18 balakumaran balakumaran 4.0K Mar  9 19:34 rootfs
 balakumaran@balakumaran-pc:~/Desktop/RPi$
 ```
@@ -28,6 +28,8 @@ firmware/boot	| boot directory of Raspberry Pi firmware repo				|
 kernel_out		| Output directory for Raspberry kernel						|
 rootfs			| rootfs from Linaro. Extracted								|
 linux-rpi...	| Raspberry Pi kernel repo									|
+
+Used [Ubuntu image rootfs](https://releases.linaro.org/archive/ubuntu/images/developer-arm64/) from [Linaro](linaro.org).
 
 ## Prepare SD card
 Make two partition as follows,
@@ -59,7 +61,9 @@ balakumaran@balakumaran-pc:~/Desktop$ sudo cp -rf ~/Desktop/RPi/rootfs/* /mnt/ro
 balakumaran@balakumaran-pc:~/Desktop$
 ```
 
-## Build and Install OS
+## Build and Install kernel
+Unless you are ready for the pain, use stable kernel release.
+
 Setup following environmental variables,
 ```sh
 balakumaran@balakumaran-pc:~/Desktop/RPi$ source ~/setup_arm64_build.sh 
@@ -74,44 +78,27 @@ balakumaran@balakumaran-pc:~/Desktop/RPi$
 
 Cross compile Kernel, Device-tree, modules.
 ```sh
-balakumaran@balakumaran-pc:~/Desktop/RPi/linux-rpi-4.19.y$ time make ARCH=arm64 O=../kernel_out/ defconfig
+balakumaran@balakumaran-pc:~/Desktop/RPi/linux-rpi-4.14.y$ time make ARCH=arm64 O=../kernel_out/ bcmrpi3_defconfig
 make[1]: Entering directory '/home/balakumaran/Desktop/RPi/kernel_out'
 .
 .
 .
 
-balakumaran@balakumaran-pc:~/Desktop/RPi/linux-rpi-4.19.y$ time make -j8  ARCH=arm64 O=../kernel_out/ 
+balakumaran@balakumaran-pc:~/Desktop/RPi/linux-rpi-4.14.y$ time make -j8  ARCH=arm64 O=../kernel_out/ 
 make[1]: Entering directory '/home/balakumaran/Desktop/RPi/kernel_out'
 .
 .
 .
 
-balakumaran@balakumaran-pc:~/Desktop/RPi/linux-rpi-4.19.y$ make ARCH=arm64 O=../kernel_out/ dtbs
+balakumaran@balakumaran-pc:~/Desktop/RPi/linux-rpi-4.14.y$ make ARCH=arm64 O=../kernel_out/ dtbs
 make[1]: Entering directory '/home/balakumaran/Desktop/RPi/kernel_out'
 .
 .
 .
 
-balakumaran@balakumaran-pc:~/Desktop/RPi/linux-rpi-4.19.y$ time make  ARCH=arm64 O=../kernel_out/ modules
-make[1]: Entering directory '/home/balakumaran/Desktop/RPi/kernel_out'
-.
-.
-.
-
-balakumaran@balakumaran-pc:~/Desktop/RPi/linux-rpi-4.19.y$ sudo cp ../kernel_out/arch/arm64/boot/Image /mnt/boot/kernel8.img
+balakumaran@balakumaran-pc:~/Desktop/RPi/linux-rpi-4.14.y$ sudo cp ../kernel_out/arch/arm64/boot/Image /mnt/boot/kernel8.img
 [sudo] password for balakumaran: 
-balakumaran@balakumaran-pc:~/Desktop/RPi/linux-rpi-4.19.y$ sudo make  ARCH=arm64 O=../kernel_out/ INSTALL_MOD_PATH=/mnt/rootfs/ modules_install 
-[sudo] password for balakumaran: 
-make[1]: Entering directory '/home/balakumaran/Desktop/RPi/kernel_out'
-arch/arm64/Makefile:27: ld does not support --fix-cortex-a53-843419; kernel may be susceptible to erratum
-arch/arm64/Makefile:40: LSE atomics not supported by binutils
-arch/arm64/Makefile:48: Detected assembler with broken .inst; disassembly will be unreliable
-  INSTALL arch/arm64/crypto/aes-neon-blk.ko
-.
-.
-.
-
-balakumaran@balakumaran-pc:~/Desktop/RPi/linux-rpi-4.19.y$ sudo make  ARCH=arm64 O=../kernel_out/ INSTALL_PATH=/mnt/boot/ dtbs_install
+balakumaran@balakumaran-pc:~/Desktop/RPi/linux-rpi-4.14.y$ sudo make  ARCH=arm64 O=../kernel_out/ INSTALL_PATH=/mnt/boot/ dtbs_install
 make[1]: Entering directory '/home/balakumaran/Desktop/RPi/kernel_out'
 arch/arm64/Makefile:27: ld does not support --fix-cortex-a53-843419; kernel may be susceptible to erratum
 arch/arm64/Makefile:40: LSE atomics not supported by binutils
@@ -125,17 +112,83 @@ make[3]: Nothing to be done for '__dtbs_install'.
 
 Create `cmdline.txt` and `config.txt`.
 ```sh
-balakumaran@balakumaran-pc:~/Desktop/RPi/linux-rpi-4.19.y$ cat /mnt/boot/cmdline.txt 
+balakumaran@balakumaran-pc:~/Desktop/RPi/linux-rpi-4.14.y$ cat /mnt/boot/cmdline.txt 
 dwc_otg.lpm_enable=0 console=serial0,115200 root=/dev/mmcblk0p2 rootfstype=ext4 rootwait
-balakumaran@balakumaran-pc:~/Desktop/RPi/linux-rpi-4.19.y$ cat /mnt/boot/config.txt 
+balakumaran@balakumaran-pc:~/Desktop/RPi/linux-rpi-4.14.y$ cat /mnt/boot/config.txt 
 dtoverlay=pi3-disable-bt
 disable_overscan=1
 dtparam=audio=on
-device_tree=dtbs/4.19.27/broadcom/bcm2710-rpi-3-b.dtb
-overlay_prefix=dtbs/4.19.27/overlays/
+device_tree=dtbs/4.14.98-v8+/broadcom/bcm2710-rpi-3-b.dtb
+overlay_prefix=dtbs/4.14.98-v8+/overlays/
 enable_uart=1
-balakumaran@balakumaran-pc:~/Desktop/RPi/linux-rpi-4.19.y$
+balakumaran@balakumaran-pc:~/Desktop/RPi/linux-rpi-4.14.y$
 ```
+
+## Prepare rootfs
+I'm going to use ubuntu-base images with some additional modification as rootfs here. Find ubuntu-base releases at [http://cdimage.ubuntu.com/ubuntu-base/releases/](http://cdimage.ubuntu.com/ubuntu-base/releases/). Latest stable is always better. Download and extract ubuntu-base rootfs. Install kernel modules into the rootfs extracted.
+
+```sh
+balakumaran@balakumaran-pc:~/Desktop/RPi/linux-rpi-4.14.y$ sudo make  ARCH=arm64 O=../kernel_out/ INSTALL_MOD_PATH=$HOME/ubuntu-base/ modules_install 
+[sudo] password for balakumaran: 
+make[1]: Entering directory '/home/balakumaran/Desktop/RPi/kernel_out'
+arch/arm64/Makefile:27: ld does not support --fix-cortex-a53-843419; kernel may be susceptible to erratum
+arch/arm64/Makefile:40: LSE atomics not supported by binutils
+arch/arm64/Makefile:48: Detected assembler with broken .inst; disassembly will be unreliable
+  INSTALL arch/arm64/crypto/aes-neon-blk.ko
+.
+.
+.
+
+```
+
+Copy your resolv.conf for network access.
+```sh
+$ sudo cp -av /run/systemd/resolve/stub-resolv.conf $HOME/rootfs/etc/resolv.conf
+```
+
+Lets `chroot` into the new rootfs and install necessary packages. But its an arm64 rootfs. So you need `qemu` user-mode emulation. Install `qemu-user-static` in your host Ubuntu and copy that to new rootfs. And then chroot will work.
+```sh
+$ sudo apt install qemu-user-static
+.
+.
+.
+
+$ sudo cp /usr/bin/qemu-aarch64-static $HOME/rootfs/usr/bin/
+$ sudo chroot $HOME/rootfs/
+```
+
+Change `root` user password and install necessary packages. As these binaries are running on emulator, they will be bit slower. Its just one time.
+```sh
+$ passwd root
+$ apt-get update
+$ apt-get upgrade
+$ apt-get install sudo ifupdown net-tools ethtool udev wireless-tools iputils-ping resolvconf wget apt-utils wpasupplicant kmod systemd vim
+```
+
+<strong>NOTE:</strong>
+If you face any error like `cannot create key file at /tmp/`, change permission of `tmp`.
+```sh
+$ chmod 777 /tmp
+```
+
+Download raspberry firmware-nonfree package from [raspberry repository](https://archive.raspberrypi.org/debian/pool/main/f/firmware-nonfree/firmware-brcm80211_20161130-3+rpt3_all.deb), extract wireless firmware and copy it to rootfs. Refer this [answer](https://www.linuxquestions.org/questions/slackware-arm-108/raspberry-pi-3-b-wifi-nic-not-found-4175627137/#post5840054) for more details. As I'm having a RPI3b board, I copied `brcmfmac43430-sdio.bin` and `brcmfmac43430-sdio.txt` to `lib/firmware/brcm`
+```sh
+$ mkdir -p $HOME/lib/modules/brcm/
+$ cp brcmfmac43430-sdio.txt brcmfmac43430-sdio.bin $HOME/lib/modules/brcm/
+```
+
+Edit `etc/fstab` or rootfs will be mounted as read-only.
+```sh
+echo "/dev/mmcblk0p2	/	ext4	defaults,noatime	0	1" >> $HOME/rootfs/etc/fstab
+```
+I referred [this](https://a-delacruz.github.io/ubuntu/rpi3-setup-filesystem.html) link for rootfs preparation. Though I'm not using, there are steps to remove unwanted files explained.
+
+## Reference
+ * https://a-delacruz.github.io/ubuntu/rpi3-setup-64bit-kernel
+ * https://a-delacruz.github.io/ubuntu/rpi3-setup-filesystem.html
+ * https://www.linuxquestions.org/questions/slackware-arm-108/raspberry-pi-3-b-wifi-nic-not-found-4175627137/#post5840054
+ * http://cdimage.ubuntu.com/ubuntu-base/releases/
+
 
 ## Appendix
 ```sh
