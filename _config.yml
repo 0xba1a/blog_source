@@ -8,7 +8,7 @@ subtitle: enjoy the sunshine
 description:
 
 # Author
-author: kaba
+author: "0xba1a"
 author_title: I am a system engineer interested in dissecting things. If I find something interesting, this is the place I share the experience.
 avatar: "/images/profile_author.jpg"
 language: en
@@ -82,7 +82,7 @@ theme: simple-japanese
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: git@github.com:kaba-official/kaba-official.github.com.git
+  repo: git@github.com:0xba1a/kaba-official.github.com.git
 
 # Sidebar
 widgets:
