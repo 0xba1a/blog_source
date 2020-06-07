@@ -13,5 +13,13 @@
     </div>
   </div>
   <%- partial('_partial/footer') %>
+
+  <script>
+    // HACK: custom style goes here
+    tables = document.querySelectorAll('table');
+    for (i = 0; i < tables.length; i++) {
+      tables[i].classList.add("table", "is-bordered", "is-fullwidth");
+    }
+  </script>
 </body>
 </html>

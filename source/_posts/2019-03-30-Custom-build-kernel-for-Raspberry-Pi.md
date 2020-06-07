@@ -2,6 +2,7 @@
 title: Custom build kernel for Raspberry Pi
 date: 2019-03-30 18:26:30
 thumbnail: "/images/custom_kernel_rpi3.jpg"
+description: "How to build your own customized kernel for Raspberry Pi using yocto."
 tags:
  - raspberrypi
  - linux

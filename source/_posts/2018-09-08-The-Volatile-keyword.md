@@ -2,6 +2,7 @@
 title: The Volatile keyword
 date: 2018-09-08 21:38:50
 thumbnail: "/images/the_volatile_keyword.jpeg"
+description: "A detailed discussion about volatile keyword."
 tags:
  - c
  - gcc

@@ -2,6 +2,8 @@
 title: Crazy debugging - who set the route?
 date: 2020-01-05 14:00:10
 thumbnail: "/images/debug.jpg"
+description: "A funny story about how I investigated and identified the script that added an entry to routing table. Wrote a wrapper over `ip route`
+command to fetch its parent pid. And found the culprit script from the parent pid."
 tags:
  - debug
  - crazy debugging

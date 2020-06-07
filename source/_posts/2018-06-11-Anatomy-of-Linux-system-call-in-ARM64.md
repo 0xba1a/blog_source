@@ -2,6 +2,8 @@
 title: Anatomy of Linux system call in ARM64
 date: 2018-06-11 20:11:46
 thumbnail: "/images/anatomy_of_system_call.png"
+description: "Architecture of Linux system call. Explains ARM64 exception levels and privilege of each level. Walks through Linux code path related to interrupt vectors and instructions that handle the system call. Bit of assembly code understanding is necessary. Explains every single instruction between `printf` and `sys_write`."
+call"
 tags:
  - system call
  - Linux

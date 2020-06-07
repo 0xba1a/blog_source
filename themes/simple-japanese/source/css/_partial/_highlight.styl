@@ -3,28 +3,42 @@ article-padding = 0
 font-size = 1em
 line-height = 1.618
 
-highlight-background = #222
+// ighlight-background = #222
+// ighlight-current-line = #393939
+// ighlight-selection = #515151
+// ighlight-foreground = #cccccc
+// ighlight-comment = #999999
+// ighlight-red = #f2777a
+// ighlight-orange = #f99157
+// ighlight-yellow = #ffcc66
+// ighlight-green = #99cc99
+// ighlight-aqua = #66cccc
+// ighlight-blue = #6699cc
+// ighlight-purple = #cc99cc
+
+highlight-background = #ddd2b126
 highlight-current-line = #393939
 highlight-selection = #515151
-highlight-foreground = #cccccc
-highlight-comment = #999999
-highlight-red = #f2777a
-highlight-orange = #f99157
-highlight-yellow = #ffcc66
-highlight-green = #99cc99
-highlight-aqua = #66cccc
-highlight-blue = #6699cc
-highlight-purple = #cc99cc
+highlight-foreground = rebeccapurple
+highlight-comment = #555
+highlight-red = darkred
+highlight-orange = darkorange
+highlight-yellow = darkyellow
+highlight-green = darkgreen
+highlight-aqua = darkaqua
+highlight-blue = darkblue
+highlight-purple = darkpurple
 
 $code-block
   background: highlight-background
   margin: 0 -1
   padding: 15px article-padding
-  border-style: solid
+  border-style: dashed
   border-color: color-border
-  border-width: 1px 0
+  border-width: 1px
   overflow: auto
   color: highlight-foreground
+  font-family: "Roboto Mono", Monospace
   line-height: font-size * line-height
 
 $line-numbers
@@ -56,6 +70,9 @@ $line-numbers
     td
       border: none
       padding: 0
+    tr
+      &:hover
+        background-color: #ffffffff
     figcaption
       clearfix()
       font-size: 0.85em

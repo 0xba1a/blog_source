@@ -1,21 +1,21 @@
 <div class="widget-wrap">
   <div class="widget-title"><%= __('widget.author') %></div>
   <aside class="profile media widget">
-    <figure class="profile-avatar media-left">
+    <!--figure class="profile-avatar media-left">
       <img src="<%=config.avatar %>" class="avatar" alt="<%=config.author %>">
-    </figure>
+    </figure-->
     <div class="media-content">
       <p>
         <strong>
           <span><%=config.author %></span>
-          <span class="icon">
-            <a href="<%- url_for(theme.contact.url) %>" target="_blank">
-              <i class="fa fa-<%=theme.contact.icon %>"></i>
-            </a>
-          </span>
         </strong>
         <br>
         <span><%= config.author_title %></span>
+        <br/>
+        <br/>
+        <a href="<%- url_for(theme.contact.url) %>" target="_blank">
+          <span style="color: orangered;text-decoration-line: underline;">Contact me</span>
+        </a>
       </p>
     </div>
   </aside>

@@ -2,6 +2,8 @@
 title: Variadic functions with unknown argument count
 date: 2019-06-29 18:59:00
 thumbnail: "/images/Variadic-functions-with-unknown-argument-count.jpg"
+description: "Variadic function is function that accepts varying number arguments. But often times we've to pass the number of arguments as the first
+argument. But once we faced a peculiar problem where the number of arguments can't be passed. And we solved it in a peculiar ;) way."
 tags:
  - programming
  - C

@@ -15,17 +15,20 @@
   <% } %>
   <% page.posts.each(post => { %>
     <article class="archive-item media">
-      <figure class="archive-thumbnail media-left">
+      <!--figure class="archive-thumbnail media-left">
         <%- partial('_partial/thumbnail', { post: post, hasLink: false, type: '10x6' }) %>
-      </figure>
+      </figure-->
       <div class="media-content">
         <div class="content">
           <%- partial('_partial/date', { datetime: post.date }) %>
-          <h3 class="archive-title title is-5">
+          <h2 class="archive-title title is-5">
             <a href="<%- url_for((post.link ? post.link : post.path)) %>">
               <%=post.title %>
             </a>
           </h3>
+          <p style="font-size:1em;">
+            <%=post.description %>
+          </p>
         </div>
       </div>
     </article>

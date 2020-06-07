@@ -2,6 +2,8 @@
 title: 64-bit Mainline kernel on Raspberry Pi 3
 date: 2018-10-06 18:42:20
 thumbnail: "/images/64bit_kernel_rpi3.jpg"
+description: "Raspberry Pi foundation maintains customized Linux kernel for Raspberry Pi devices. Cross-compiling vanilla kernel to Raspberry Pi is
+bit challenging. But its worth giving a try as we can test latest kernel on it. This article is a step-by-step guide to build vanilla kernel for Raspberry Pi 3. It explains necessary device-tree files and kernel configurations related to Raspberry Pi."
 tags:
  - raspberrypi
  - linux

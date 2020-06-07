@@ -15,8 +15,12 @@
                 </a>
               </p>
               <p class="">
-                <small>
+                <!--small>
                   <%- partial('../_partial/date.ejs', { datetime: post.date }) %>
+                </small>
+                <br/-->
+                <small>
+                  <%- partial('../_partial/tag.ejs', { post: post }) %>
                 </small>
               </p>
             </div>

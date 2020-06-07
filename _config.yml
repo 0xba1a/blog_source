@@ -8,15 +8,15 @@ subtitle: enjoy the sunshine
 description:
 
 # Author
-author: "0xba1a"
-author_title: I am a system engineer interested in dissecting things. If I find something interesting, this is the place I share the experience.
+author: "Balakumaran Kannan"
+author_title: System software engineer specilied in Linux. Experience spans from ARM32 board bring-up to multi datacenter cloud management. Open source contributer. From Bangalore, India.
 avatar: "/images/profile_author.jpg"
 language: en
 timezone: Asia/Kolkata
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://eastrivervillage.com
+url: https://eastrivervillage.com
 permalink: :title/
 permalink_defaults:
 
@@ -45,7 +45,7 @@ highlight:
   line_number: true
   auto_detect: false
   tab_replace:
-  
+
 # Home page setting
 # path: Root path for your blogs index page. (default = '')
 # per_page: Posts displayed per page. (0 = disable pagination)
@@ -54,7 +54,7 @@ index_generator:
   path: ''
   per_page: 10
   order_by: -date
-  
+
 # Category & Tag
 default_category: uncategorized
 category_map:

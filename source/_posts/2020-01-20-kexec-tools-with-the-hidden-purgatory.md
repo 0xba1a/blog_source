@@ -2,10 +2,13 @@
 title: kexec - A travel to the purgatory
 date: 2020-01-20 17:35:13
 thumbnail: "/images/purgatory.jpg"
+description: "A story about how I fixed the boot delay in an ARM64 system. This article walks through Linux reboot / kexec code path, a bit of kexec-tools source and
+importantly how kexec-tools injects its code in your boot path."
 tags:
  - linux
  - ARMv8
  - kernel
+ - crazy debugging
 ---
 
 This is one of the unforgettable experience in my engineering life. Last year when we brought-up a ARM64 based platform, we faced lots of hurdles. But this one was very interesting and had lots of surprises. Though this triaging effort tolled multiple frustrating days, I had very good learning. I had to understand `kexec_load` system call, kernel reboot path and kernel early boot path to root cause the issue. We were using 4.14.19 kernel for the bring-up. But I'll give code samples from 5.4.14 as it is latest. There is no much code difference.
